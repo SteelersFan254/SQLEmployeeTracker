@@ -22,7 +22,7 @@ inquirer.prompt([
         type: "list",
         message: "What would you like to do?",
         name: "firstQuestion",
-        choices: ["Add department", "Add role", "Add employee", "View department", "View roles", "View employees", "Update role", "Delete department", "Delete role", "Delete employee"
+        choices: ["Add department", "Add role", "Add employee", "View department", "View roles", "View employees", "Update role", "Delete department", "Delete role", "Delete employee", "View employee by role"
         ]
     }
 ]).then(function (data) {
@@ -50,10 +50,12 @@ inquirer.prompt([
             return deleteRole();
         case "Delete employee":
             return deleteEmployee();
+        case "View employee by role":
+            return viewEmployeeByRole();
     }
 })
 
-var roles = ["FOH Manager", "BOH Manager", "GM", "Server", "Host", "Bus Boy", "Cook"]
+
 
 /////Function that selects all the columns from the employee table/////
 function viewEmployees() {
@@ -79,14 +81,15 @@ function viewDepartment() {
 function viewRoles() {
 
     console.log("Bringing up role...\n");
-    connection.query("SELECT * FROM role", function (err, res) {
+    connection.query("SELECT title, , salary, name FROM role INNER JOIN department ON role.departmentID = department.id", function (err, res) {
         if (err) throw err;
         console.table(res);
         connection.end()
     });
 };
-
-/////Function to add employee to
+//////////array to hold all titles so it can be used to convert titles to roleID/////////
+var roles = ["FOH Manager", "BOH Manager", "GM", "Server", "Host", "Bus Boy", "Cook"]
+/////Function to add employees/////
 function addEmployee() {
     inquirer.prompt([
         {
@@ -106,8 +109,9 @@ function addEmployee() {
     ]).then(function (data) {
         console.log("Creating a new employee...\n");
         for (let i = 0; i < roles.length; i++) {
-            if (data.role = roles[i]) {
+            if (data.role === roles[i]) {
                 var roley = (i + 1);
+                console.log(roley);
             };
         };
         console.log("before the query");
@@ -123,8 +127,7 @@ function addEmployee() {
 
     })
 };
-// console.table
-// add department
+/////function to add a department to department table/////
 function addDepartment() {
     inquirer.prompt([
         {
@@ -138,7 +141,8 @@ function addDepartment() {
         connection.end()
     })
 };
-// add roles
+
+/////function to add role to role table///////////
 function addRole() {
     inquirer.prompt([
         {
@@ -158,14 +162,13 @@ function addRole() {
         console.log("Inserting a new role.../n");
         connection.query("INSERT INTO role SET ?", data);
         console.log(data);
+        roles.push(data.title);
+        console.log(roles);
         connection.end()
     })
 }
-// add employees
-// view (SELECT * FROM) departments
-// view roles
-// view employees
-// update roles 
+
+/////////function to update roleId in employee table//////////
 function updateEmployee() {
     inquirer.prompt([
         {
@@ -193,6 +196,7 @@ function updateEmployee() {
     })
 };
 
+/////////function to delete department row from department table/////////
 function deleteDepartment() {
     inquirer.prompt([
         {
@@ -207,6 +211,7 @@ function deleteDepartment() {
     })
 };
 
+//////////function to delete role row from row table/////////
 function deleteRole() {
     inquirer.prompt([
         {
@@ -217,10 +222,13 @@ function deleteRole() {
     ]).then(function (data) {
         console.log("Deleting role\n" + data.title);
         connection.query("DELETE FROM role WHERE ?", data);
+        roles.pop(data.title);
+        console.log(roles);
         connection.end()
     })
 };
 
+/////////function to delete employee row from employee table//////////
 function deleteEmployee() {
     inquirer.prompt([
         {
@@ -229,18 +237,25 @@ function deleteEmployee() {
             name: "firstName",
         },
     ]).then(function (data) {
-        console.log("Deleting department\n" + data.firstName);
+        console.log("Deleting employee\n" + data.firstName);
         connection.query("DELETE FROM employee WHERE ?", data);
         connection.end()
     })
 };
 
-
-
-function addemployees() {
-    for (i = 0; i < roles.length; i++) {
-        if (data.role = role[i + 1]) {
-            var roleID = (i + 1)
+function viewEmployeeByRole() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What employees would you like to view?",
+            name: "title"
         }
-    }
-};
+    ]).then(function (data) {
+        connection.query(`SELECT firstName, lastName, title FROM employee INNER JOIN role ON employee.roleID = role.id WHERE role.title = "${data.title}"`, function (err, res) {
+            if(err) throw err;
+            console.table(res);
+            connection.end();
+        })
+    })
+}
+
