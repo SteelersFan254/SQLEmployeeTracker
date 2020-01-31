@@ -22,7 +22,7 @@ inquirer.prompt([
         type: "list",
         message: "What would you like to do?",
         name: "firstQuestion",
-        choices: ["Add department", "Add role", "Add employee", "View department", "View roles", "View employees", "Update role", "Delete department", "Delete role", "Delete employee", "View employee by role"
+        choices: ["Add", "View", "Update role", "Delete department", "Delete role", "Delete employee"
         ]
     }
 ]).then(function (data) {
@@ -30,18 +30,10 @@ inquirer.prompt([
     var path = data.firstQuestion
     /////////////////////Switch statement with cases depending on your choice///////////////////////////
     switch (path) {
-        case "Add department":
-            return addDepartment();
-        case "Add role":
-            return addRole();
-        case "Add employee":
-            return addEmployee();
-        case "View department":
-            return viewDepartment();
-        case "View roles":
-            return viewRoles();
-        case "View employees":
-            return viewEmployees();
+        case "Add":
+            return addList();
+        case "View":
+            return viewList();
         case "Update role":
             return updateEmployee();
         case "Delete department":
@@ -50,8 +42,7 @@ inquirer.prompt([
             return deleteRole();
         case "Delete employee":
             return deleteEmployee();
-        case "View employee by role":
-            return viewEmployeeByRole();
+
     }
 })
 
@@ -81,7 +72,7 @@ function viewDepartment() {
 function viewRoles() {
 
     console.log("Bringing up role...\n");
-    connection.query("SELECT title, , salary, name FROM role INNER JOIN department ON role.departmentID = department.id", function (err, res) {
+    connection.query("SELECT title, salary, name FROM role INNER JOIN department ON role.departmentID = department.id", function (err, res) {
         if (err) throw err;
         console.table(res);
         connection.end()
@@ -252,10 +243,80 @@ function viewEmployeeByRole() {
         }
     ]).then(function (data) {
         connection.query(`SELECT firstName, lastName, title FROM employee INNER JOIN role ON employee.roleID = role.id WHERE role.title = "${data.title}"`, function (err, res) {
-            if(err) throw err;
+            if (err) throw err;
             console.table(res);
             connection.end();
         })
     })
 }
 
+function addList() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "addQuestion",
+            choices: ["Add department", "Add role", "Add employee"]
+        }
+    ]).then(function (data) {
+        console.log(data)
+        /////////////////////Switch statement with cases depending on your choice///////////////////////////
+        switch (data.addQuestion) {
+            case "Add department":
+                return addDepartment();
+            case "Add role":
+                return addRole();
+            case "Add employee":
+                return addEmployee();
+        }
+    })
+};
+
+function viewList() {
+
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "viewQuestion",
+            choices: ["View department", "View employees", "View roles", "View employees by role"]
+        }
+    ]).then(function (data) {
+        switch (data.viewQuestion) {
+            case "View department":
+                return viewDepartment();
+            case "View roles":
+                return viewRoles();
+            case "View employees":
+                console.log("HEllo");
+                return viewEmployees();
+            case "View employee by role":
+                return viewEmployeeByRole();
+            default:
+                console.log("oops, shouldn't be here");
+                break;
+        }
+    })
+}
+
+function deleteList() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "deleteQuestion",
+            choices: ["Delete department", "Delete role", "Delete employee"
+            ]
+        }
+    ]).then(function (data) {
+        console.log(data)
+        var path = data.deleteQuestion
+        /////////////////////Switch statement with cases depending on your choice///////////////////////////
+        switch (path) {
+            case "Delete department":
+                return deleteDepartment();
+            case "Delete role":
+                return deleteRole();
+            case "Delete employee":
+                return deleteEmployee();
+    
+        }
+    })
+}
