@@ -22,7 +22,7 @@ inquirer.prompt([
         type: "list",
         message: "What would you like to do?",
         name: "firstQuestion",
-        choices: ["Add", "View", "Update role", "Delete department", "Delete role", "Delete employee"
+        choices: ["Add", "View", "Update role", "Delete"
         ]
     }
 ]).then(function (data) {
@@ -36,13 +36,8 @@ inquirer.prompt([
             return viewList();
         case "Update role":
             return updateEmployee();
-        case "Delete department":
-            return deleteDepartment();
-        case "Delete role":
-            return deleteRole();
-        case "Delete employee":
-            return deleteEmployee();
-
+        case "Delete":
+            return deleteList();
     }
 })
 
@@ -319,4 +314,28 @@ function deleteList() {
     
         }
     })
+}
+
+function deleteList(){
+inquirer.prompt([
+    {
+        type: "list",
+        name: "deleteQuestion",
+        choices: ["Delete department", "Delete role", "Delete employee"
+        ]
+    }
+]).then(function (data) {
+    console.log(data)
+    var path = data.deleteQuestion
+    /////////////////////Switch statement with cases depending on your choice///////////////////////////
+    switch (path) {
+        case "Delete department":
+            return deleteDepartment();
+        case "Delete role":
+            return deleteRole();
+        case "Delete employee":
+            return deleteEmployee();
+
+    }
+})
 }
