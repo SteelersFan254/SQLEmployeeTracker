@@ -249,13 +249,13 @@ function addList() {
     inquirer.prompt([
         {
             type: "list",
-            name: "addQuestion",
+            name: "ADD",
             choices: ["Add department", "Add role", "Add employee"]
         }
     ]).then(function (data) {
         console.log(data)
         /////////////////////Switch statement with cases depending on your choice///////////////////////////
-        switch (data.addQuestion) {
+        switch (data.ADD) {
             case "Add department":
                 return addDepartment();
             case "Add role":
@@ -271,11 +271,11 @@ function viewList() {
     inquirer.prompt([
         {
             type: "list",
-            name: "viewQuestion",
-            choices: ["View department", "View employees", "View roles", "View employees by role"]
+            name: "VIEW",
+            choices: ["View department", "View employees", "View roles", "View employees by role", "View employee by department"]
         }
     ]).then(function (data) {
-        switch (data.viewQuestion) {
+        switch (data.VIEW) {
             case "View department":
                 return viewDepartment();
             case "View roles":
@@ -285,9 +285,35 @@ function viewList() {
                 return viewEmployees();
             case "View employee by role":
                 return viewEmployeeByRole();
+            case "View employee by department":
+                return viewEmployeeByDepartment();
             default:
                 console.log("oops, shouldn't be here");
                 break;
+        }
+    })
+}
+
+function deleteList() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "DELETE",
+            choices: ["Delete department", "Delete role", "Delete employee"
+            ]
+        }
+    ]).then(function (data) {
+        console.log(data)
+        var path = data.DELETE
+        /////////////////////Switch statement with cases depending on your choice///////////////////////////
+        switch (path) {
+            case "Delete department":
+                return deleteDepartment();
+            case "Delete role":
+                return deleteRole();
+            case "Delete employee":
+                return deleteEmployee();
+
         }
     })
 }
@@ -311,31 +337,24 @@ function deleteList() {
                 return deleteRole();
             case "Delete employee":
                 return deleteEmployee();
-    
+
         }
     })
 }
 
-function deleteList(){
-inquirer.prompt([
-    {
-        type: "list",
-        name: "deleteQuestion",
-        choices: ["Delete department", "Delete role", "Delete employee"
-        ]
-    }
-]).then(function (data) {
-    console.log(data)
-    var path = data.deleteQuestion
-    /////////////////////Switch statement with cases depending on your choice///////////////////////////
-    switch (path) {
-        case "Delete department":
-            return deleteDepartment();
-        case "Delete role":
-            return deleteRole();
-        case "Delete employee":
-            return deleteEmployee();
-
-    }
-})
+function viewEmployeeByDepartment() {
+    inquirer.prompt([
+        {
+            input: "rawlist",
+            message: "What is the department id?",
+            name: "id",
+            choices: ["1", "2", "3"]
+        }
+    ]).then(function (data) {
+        connection.query("SELECT firstName, lastName, name FROM employee INNER JOIN department WHERE employee.roleID = role.id", function (err, res) {
+            if (err) throw err;
+            console.table(res);
+            connection.end();
+        })
+    })
 }
